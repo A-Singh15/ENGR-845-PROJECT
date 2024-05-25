@@ -2,6 +2,6 @@
 
 `define SMEM_MAX 1024
 `define RMEM_MAX 256
-`define TRANSACTION_COUNT 1000
+`define TRANSACTION_COUNT 1593
 `define DRIV_IF memoryInterface.DriverInterface.Driver_cb
 `define MON_IF memoryInterface.MonitorInterface.Monitor_cb
