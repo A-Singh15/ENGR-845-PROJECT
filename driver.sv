@@ -35,9 +35,9 @@ class driver;
   // Drive task: Drives transactions into DUT through the interface
   task drive;
     Transaction trans;
-    forever begin
+    for (int i = 0; i < `TRANSACTION_COUNT; i++) begin
       gen2driv.get(trans);
-      $display(" ****************************************Driving Transaction %0d**************************************** ", no_transactions);
+      $display(" ****************************************Driving Transaction %0d**************************************** ", no_transactions + 1);
       memoryInterface.referenceMemory = trans.referenceMemory;  // Drive referenceMemory to interface
       memoryInterface.searchMemory = trans.searchMemory;  // Drive searchMemory to interface
       memoryInterface.start = 1; 
@@ -56,15 +56,8 @@ class driver;
   // Main task: Starts the driver and continuously drives transactions
   task main;
     $display(" **************************************** Driver Main Started****************************************");
-    forever begin
-      fork
-        begin
-          forever
-            drive();
-        end
-      join
-      disable fork;
-    end
+    start();
+    drive();
   endtask
         
 endclass
