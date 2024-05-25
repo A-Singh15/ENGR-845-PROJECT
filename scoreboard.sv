@@ -1,3 +1,4 @@
+
 `timescale 1ns/1ps
 
 class scoreboard;
@@ -75,5 +76,17 @@ class scoreboard;
       $display("****************************************\n");
     end
   endtask
+
+ // Summary function: Displays a summary of the test results
+  function void summary();
+    $display("*****************************************");
+    $display("|              Test Results              |");
+    $display("*****************************************");
+    $display("| Total Packets        | %6d            |", no_transactions);
+    $display("| Perfect Matches      | %6d            |", perfect);
+    $display("| Partial Matches      | %6d            |", partial);
+    $display("| No Matches           | %6d            |", nomatch);
+    $display("*****************************************");
+  endfunction
 
 endclass
