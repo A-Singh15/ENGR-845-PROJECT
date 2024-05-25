@@ -1,4 +1,4 @@
-`timescale 1ns/1ps
+/*`timescale 1ns/1ps
 
 class Transaction;
 
@@ -70,4 +70,78 @@ class Transaction;
     end
   endfunction
 
+endclass*/
+`timescale 1ns/1ps
+
+class Transaction;
+
+  // Memory arrays for reference and search data
+  logic [7:0] referenceMemory[`RMEM_MAX-1:0];
+  rand logic [7:0] searchMemory[`SMEM_MAX-1:0];
+
+  // Motion vectors and best distance metrics
+  rand integer expectedXMotion;
+  rand integer expectedYMotion;
+  integer actualXMotion;
+  integer actualYMotion;
+  logic [7:0] bestDistance;
+
+  // Random index for introducing mismatches
+  rand int randomMismatchIndex;
+  
+  // Constraints for expected motion vectors
+  constraint expectedMotionConstraint { 
+    expectedXMotion dist {[-7:0]:=10, [1:7]:=10};
+    expectedYMotion dist {[-7:0]:=10, [1:7]:=10};
+  };
+
+  // Constraint for limiting mismatch index to a specific range
+  constraint mismatchIndexConstraint {
+    randomMismatchIndex inside {[0:10]};
+  };
+
+  // Constraints for search memory values
+  constraint searchMemoryConstraint {
+    foreach(searchMemory[i]) searchMemory[i] inside {[0:255]};
+  };
+
+  // Display function to output transaction details
+  function void display();
+    $display("*---------*----------*--------* SEARCH MEMORY *--------*--------*-------*----------*----------*");
+    for (int j = 0; j < `SMEM_MAX; j++) begin
+      if (j % 32 == 0) $display("  ");
+      $write("%h  ", searchMemory[j]);
+      if (j == 1023) $display("  ");
+    end
+
+    $display("*---------*----------*--------* REFERENCE MEMORY *--------*--------*-------*---------*-------*");
+    for (int j = 0; j < `RMEM_MAX; j++) begin
+      if (j % 16 == 0) $display("  ");
+      $write("%h ", referenceMemory[j]);
+      if (j == 255) $display("  ");
+    end
+
+    $display("\n randomMismatchIndex : %0d", randomMismatchIndex);     
+    $display("Expected_motionX : %0d", expectedXMotion);
+    $display("Expected_motionY : %0d", expectedYMotion);
+  endfunction
+
+  // Function to generate reference memory based on search memory and motion vectors
+  function void generateReferenceMemory();
+    foreach (referenceMemory[i]) begin
+      // Generate a full match by default
+      referenceMemory[i] = searchMemory[32 * 8 + 8 + (((i / 16) + expectedYMotion) * 32) + ((i % 16) + expectedXMotion)];
+      
+      // Introduce a partial match at the random mismatch index
+      if (i == randomMismatchIndex)   
+        referenceMemory[i] = $urandom_range(0, 255);
+    end
+
+    // Shuffle referenceMemory to create no match if randomMismatchIndex is above a threshold
+    if (randomMismatchIndex > 10) begin
+      referenceMemory.shuffle();
+    end
+  endfunction
+
 endclass
+
