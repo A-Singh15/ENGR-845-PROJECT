@@ -61,7 +61,6 @@ class environment;
     wait(gen.trans_count == driv.no_transactions);
     wait(gen.trans_count == scb.no_transactions);
     $display ("Coverage Report = %0.2f %% \n", cov.coverageScore);  // Updated print statement
-    scb.summary();  // Print summary
   endtask 
   
   // Run task: Executes the complete test sequence
